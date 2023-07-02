@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  
+  web_page:
+    build:
+      context: .
+      dockerfile: Dockerfile_backend
+    command: bash -c "pwd && ls && cd rabbitmq_pika && python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    stdin_open: true
+    tty: true
+    container_name: web_page_1
+    ports:
+      - "8000:8000"
+    networks:
+      - default
+    depends_on:
+      - rabbitmq-service
+    links:
+      - rabbitmq-service
+  consumer-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: bash -c "pwd && ls && python consumer.py"
+    stdin_open: true
+    tty: true
+    container_name: pika_consumer
+    networks:
+      - default
+    depends_on:
+      - rabbitmq-service
+    links:
+      - rabbitmq-service
+  rabbitmq-service:
+    image: 'rabbitmq:latest'
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    ports:
+      - "5672:5672"
+    networks:
+      - default
+networks:
+  default:
+    

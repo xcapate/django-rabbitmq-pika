@@ -1,0 +1,4 @@
+rabbitmqctl add_user pika pika
+rabbitmqctl add_vhost pika_vhost
+rabbitmqctl set_permissions -p pika_vhost pika "." "." ".*"
+rabbitmqctl set_user_tags pika management
